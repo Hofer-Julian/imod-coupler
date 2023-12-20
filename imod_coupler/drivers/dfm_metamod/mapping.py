@@ -253,9 +253,9 @@ class Mapping:
         # MF RIV 2 -> DFLOW 1D (flux)
         map_passive_mod_dflow1d["mf-riv2dflow1d_passive_flux"] = None
         mask_passive_mod_dflow1d["mf-riv2dflow1d_passive_flux"] = np.array([])
-        if self.coupling.mf6_river2_to_dmf_1d_q_dmm is not None:
+        if self.coupling.mf6_river2_to_dfm_1d_q_dmm is not None:
             table_passive_mfriv2dflow1d: NDArray[np.single] = np.loadtxt(
-                self.coupling.mf6_river2_to_dmf_1d_q_dmm,
+                self.coupling.mf6_river2_to_dfm_1d_q_dmm,
                 dtype=np.single,
                 ndmin=2,
                 skiprows=1,
@@ -420,7 +420,7 @@ class Mapping:
 
         # MSW -> DFLOW 2D (ponding)
 
-        # ---mapping of msw poning to dflow2d---
+        # ---mapping of msw ponding to dflow2d---
         table_mswponding2dflow2d = np.array([], dtype=np.single)
         map_msw_dflow2d["msw-ponding2dflow2d_flux"] = None
         mask_msw_dflow2d["msw-ponding2dflow2d_flux"] = np.array([])
@@ -452,18 +452,7 @@ class Mapping:
                 self.array_dims["dfm_2d"],
                 Operator.SUM,
             )
-            # DFLOW 2D -> MSW (ponding)
-            # TODO: check if this is always, 1:1 connection, otherwise use weights
-            (
-                map_msw_dflow2d["dflow2d_flux2msw-ponding"],
-                mask_msw_dflow2d["dflow2d_flux2msw-ponding"],
-            ) = create_mapping(
-                dflow_idx,
-                msw_idx,
-                self.array_dims["dfm_2d"],
-                self.array_dims["msw_sw_ponding"],
-                Operator.SUM,  # check TODO
-            )
+
         # DFLOW 2D -> MSW (stage/innudation)
         table_dflow2d_stage2mswponding = np.array([], dtype=np.single)
         map_msw_dflow2d["dflow2d_stage2msw-ponding"] = None
