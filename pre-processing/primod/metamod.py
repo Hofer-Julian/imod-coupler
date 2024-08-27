@@ -4,7 +4,9 @@ from typing import Any
 
 import tomli_w
 from imod.mf6 import Modflow6Simulation
+from imod.mf6.utilities.regrid import RegridderWeightsCache
 from imod.msw import MetaSwapModel
+from imod.typing.grid import GridDataArray
 
 from primod.coupled_model import CoupledModel
 from primod.driver_coupling.metamod import MetaModDriverCoupling
@@ -159,3 +161,20 @@ class MetaMod(CoupledModel):
             tomli_w.dump(coupler_toml, f)
 
         return
+
+    def regrid_like(self, new_grid: GridDataArray) -> "MetaMod":
+        regridded_mf6_simulation = self.mf6_simulation.regrid_like(
+            "regridded", new_grid, True
+        )
+        models = regridded_mf6_simulation.get_models()
+        dis = list(models.values())[0]["dis"]
+        regrid_context = RegridderWeightsCache()
+        regridded_msw = self.msw_model.regrid_like(dis, True, regrid_context)
+
+        regridded_metamod = MetaMod(
+            msw_model=regridded_msw,
+            mf6_simulation=regridded_mf6_simulation,
+            coupling_list=self.coupling_list,
+        )
+
+        return regridded_metamod
